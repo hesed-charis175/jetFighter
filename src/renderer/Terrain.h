@@ -32,8 +32,6 @@ private:
   int indexCount;
   TerrainMode mode = TerrainMode::Mountains;
 
-  // Baked heightmap cache (computed once at startup, sampled every frame
-  // instead of re-running the FBM noise stack per vertex / per physics probe).
   static constexpr int HEIGHT_RES = 512;
   float worldSize = 12000.f;
   std::vector<float> heightCache;

@@ -30,8 +30,6 @@ private:
   vec_d_p real;
   vec_d_p imag;
 
-  // Reusable scratch buffers, sized once in the constructor instead of being
-  // heap-allocated on every radix_direct/radix_reverse/sort call.
   std::vector<double> scratchR, scratchI;
 };
 #endif

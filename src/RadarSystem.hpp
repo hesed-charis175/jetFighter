@@ -21,13 +21,11 @@ private:
   float maxDetectionRange = 2500.0f;
   glm::vec2 radarCenterScreen = glm::vec2(1070.0f, 130.0f);
 
-  // Landmarks, set once via SetLandmarks() — not passed every frame.
   glm::vec3 cityCenter = glm::vec3(0.f);
   float cityRadius = 0.f;
   float enclosureHalfSize = 0.f;
-  float altitudeCeilingY = -1e9f; // sentinel "unset"
+  float altitudeCeilingY = -1e9f;
 
-  // Altitude ladder layout
   float ladderX = 55.0f;
   float ladderHalfHeightPx = 130.0f;
   float ladderHalfRangeMeters = 1500.0f;
@@ -122,8 +120,6 @@ private:
     glDrawArrays(mode, 0, vertices.size() / 2);
   }
 
-  // Projects world space position onto radar screen position and handles border
-  // clamping
   bool WorldToRadar(const glm::vec3 &worldPos, const glm::vec3 &playerPos,
                     const glm::quat &playerOrientation, glm::vec2 &outScreenPos,
                     bool &outIsClamped) {
@@ -159,9 +155,6 @@ private:
     return true;
   }
 
-  // Lights up a wedge on the outer ring in the direction of a nearby
-  // enclosure wall — replaces the old always-clamped corner dots, which
-  // were almost never useful since the enclosure is bigger than radar range.
   void DrawWallWarnings(const glm::vec3 &playerPos,
                         const glm::quat &playerOrientation) {
     if (enclosureHalfSize <= 0.f)
@@ -212,8 +205,6 @@ private:
     }
   }
 
-  // Draws the city as a filled, ringed disc scaled to its real radius,
-  // instead of a single point.
   void DrawCityMarker(const glm::vec3 &playerPos,
                       const glm::quat &playerOrientation) {
     if (cityRadius <= 0.f)
@@ -249,8 +240,6 @@ private:
     drawLines(ring, glm::vec4(0.3f, 0.75f, 1.0f, 0.9f), GL_LINE_LOOP, 1.5f);
   }
 
-  // Vertical altitude tape: player always centered, contacts / ground /
-  // ceiling shown as ticks at their relative height.
   void DrawAltitudeLadder(const glm::vec3 &playerPos, float terrainYBelowPlayer,
                           const std::vector<RadarBlip> &blips) {
     float halfH = ladderHalfHeightPx;
@@ -284,7 +273,6 @@ private:
     drawLines(minorTicks, glm::vec4(1, 1, 1, 0.25f), GL_LINES, 1.0f);
     drawLines(majorTicks, glm::vec4(1, 1, 1, 0.55f), GL_LINES, 1.5f);
 
-    // Ground reference
     {
       bool clamped;
       float delta = terrainYBelowPlayer - playerPos.y;
@@ -295,7 +283,6 @@ private:
       }
     }
 
-    // Ceiling reference
     if (altitudeCeilingY > -1e8f) {
       bool clamped;
       float delta = altitudeCeilingY - playerPos.y;
@@ -306,8 +293,6 @@ private:
       }
     }
 
-    // Contacts (reuses the same colors as the round radar, so a contact is
-    // easy to correlate between the two widgets)
     for (const auto &blip : blips) {
       bool clamped;
       float delta = blip.worldPos.y - playerPos.y;
@@ -317,7 +302,6 @@ private:
       if (!clamped) {
         tri = {cx + 6.f, yy, cx + 16.f, yy - 4.f, cx + 16.f, yy + 4.f};
       } else {
-        // pinned to the edge, nudged further out to read as "off-scale"
         float dir = (delta > 0.f) ? -3.f : 3.f;
         tri = {cx + 6.f,       yy,        cx + 16.f,
                yy + dir - 4.f, cx + 16.f, yy + dir + 4.f};
@@ -325,7 +309,6 @@ private:
       drawLines(tri, glm::vec4(blip.color, 0.95f), GL_TRIANGLES);
     }
 
-    // Player marker — always dead center
     std::vector<float> playerMark = {cx - 10.f, cy,       cx + 2.f,
                                      cy - 5.f,  cx + 2.f, cy + 5.f};
     drawLines(playerMark, glm::vec4(1.0f, 1.0f, 0.2f, 1.0f), GL_TRIANGLES);
@@ -346,7 +329,6 @@ public:
         glm::vec2(w - radarRadiusPixels - 30.0f, radarRadiusPixels + 30.0f);
   }
 
-  // Call once after setup — these don't change frame to frame.
   void SetLandmarks(const glm::vec3 &cityCenterIn, float cityRadiusIn,
                     float enclosureHalfSizeIn, float altitudeCeilingIn) {
     cityCenter = cityCenterIn;
@@ -372,7 +354,6 @@ public:
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uProjection"), 1,
                        GL_FALSE, glm::value_ptr(proj));
 
-    // ---- Round radar background ----
     glBindVertexArray(circleVAO);
     glm::mat4 bgModel =
         glm::translate(glm::mat4(1.0f), glm::vec3(radarCenterScreen, 0.0f));
@@ -392,11 +373,9 @@ public:
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "uProjection"), 1,
                        GL_FALSE, glm::value_ptr(proj));
 
-    // ---- Landmarks ----
     DrawWallWarnings(playerPos, playerOrientation);
     DrawCityMarker(playerPos, playerOrientation);
 
-    // ---- Crosshair grid ----
     std::vector<float> gridLines = {radarCenterScreen.x - radarRadiusPixels,
                                     radarCenterScreen.y,
                                     radarCenterScreen.x + radarRadiusPixels,
@@ -407,14 +386,12 @@ public:
                                     radarCenterScreen.y + radarRadiusPixels};
     drawLines(gridLines, glm::vec4(1.0f, 1.0f, 1.0f, 0.15f), GL_LINES, 1.0f);
 
-    // ---- Center player marker ----
     std::vector<float> playerTri = {
         radarCenterScreen.x,        radarCenterScreen.y + 6.0f,
         radarCenterScreen.x - 4.0f, radarCenterScreen.y - 4.0f,
         radarCenterScreen.x + 4.0f, radarCenterScreen.y - 4.0f};
     drawLines(playerTri, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f), GL_TRIANGLES);
 
-    // ---- Dynamic contacts (other planes) ----
     for (const auto &blip : blips) {
       glm::vec2 groundPos;
       bool isClamped = false;
@@ -428,8 +405,6 @@ public:
 
         glm::vec2 targetPos = groundPos + glm::vec2(0.0f, altitudeLineHeight);
 
-        // Stem alpha communicates "how far off your altitude" at a glance,
-        // even without reading the exact offset.
         float altMag = glm::clamp(std::abs(altitudeDelta) / 600.0f, 0.0f, 1.0f);
 
         if (!isClamped) {
@@ -456,7 +431,6 @@ public:
       }
     }
 
-    // ---- Altitude ladder (second widget) ----
     DrawAltitudeLadder(playerPos, terrainYBelowPlayer, blips);
 
     glEnable(GL_DEPTH_TEST);

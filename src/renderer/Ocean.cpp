@@ -26,8 +26,7 @@ static double phillips(int nx, int ny, int N, float lx, float ly,
   double L2 = pow(windSpeed * windSpeed / g, 2.0);
   double minW2 = 0.0001;
   double result = amplitude * exp(-1.0 / (k2 * L2)) * exp(-k2 * minW2) *
-                  pow(kx * kx / k2, 2) // wind alignment
-                  / (k2 * k2);
+                  pow(kx * kx / k2, 2) / (k2 * k2);
   return result;
 }
 

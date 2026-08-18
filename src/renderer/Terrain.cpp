@@ -10,8 +10,8 @@ Terrain::Terrain()
       shadowShader("assets/shaders/shadowmap.vert",
                    "assets/shaders/shadowmap.frag") {
   buildMesh(256, 12000.f);
-  buildHeightmap(12000.f); // bake once — was previously recomputed every
-                           // vertex, every frame
+  buildHeightmap(12000.f);
+
   initShadowMap();
 }
 void Terrain::buildMesh(int N, float size) {

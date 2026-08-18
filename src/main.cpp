@@ -2,7 +2,7 @@
 #include "GameWindow.h"
 #include "Keys.h"
 #include "Plane.h"
-#include "RadarSystem.hpp" // <-- Added
+#include "RadarSystem.hpp"
 #include "config.h"
 #include "physics/PhysicsWorld.h"
 #include "physics/PlaneBody.h"
@@ -18,7 +18,7 @@
 #include "renderer/Tracer.h"
 #include <SDL2/SDL_video.h>
 #include <iostream>
-#include <vector> // <-- Added
+#include <vector>
 
 PlaneInput playerInput(const Uint8 *keys) {
   PlaneInput in;
@@ -45,7 +45,6 @@ int main() {
   Terrain terrain;
   Ocean ocean(128, 3500.f, 3500.f);
 
-  // Initialize Radar System
   RadarSystem radar((float)window.size.w, (float)window.size.h, 110.0f,
                     2500.0f);
 
@@ -296,7 +295,6 @@ int main() {
 
     tracer.draw(proj * view, cam.pos);
 
-    // ==================== RADAR RENDER ====================
     std::vector<RadarBlip> radarBlips;
     for (int i = 1; i < NUM_PLANES; ++i) {
       radarBlips.push_back(
@@ -309,7 +307,6 @@ int main() {
     radar.SetScreenSize((float)window.size.w, (float)window.size.h);
     radar.RenderRadar(planes[0].position, planes[0].orientation, terrainBelow,
                       radarBlips);
-    // ======================================================
     SDL_GL_SwapWindow(window.win);
   }
 
