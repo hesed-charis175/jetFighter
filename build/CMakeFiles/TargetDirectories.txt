@@ -1,0 +1,3 @@
+/home/openheimer/dev/spAr/build/CMakeFiles/rjetfighter.dir
+/home/openheimer/dev/spAr/build/CMakeFiles/edit_cache.dir
+/home/openheimer/dev/spAr/build/CMakeFiles/rebuild_cache.dir

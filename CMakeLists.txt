@@ -12,11 +12,11 @@ find_package(SDL2_mixer REQUIRED)
 
 file(GLOB_RECURSE SOURCES src/*.cpp)
 
-add_executable(jetfighter ${SOURCES})
+add_executable(rjetfighter ${SOURCES})
 
-target_compile_definitions(jetfighter PRIVATE GLM_ENABLE_EXPERIMENTAL)
+target_compile_definitions(rjetfighter PRIVATE GLM_ENABLE_EXPERIMENTAL)
 
-target_link_libraries(jetfighter
+target_link_libraries(rjetfighter
     SDL2::SDL2
     OpenGL::GL
     GLEW::GLEW

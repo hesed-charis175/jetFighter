@@ -20,8 +20,8 @@ static constexpr float PITCH_ACC = 1.6f;
 static constexpr float PITCH_MAX = 2.2f;
 static constexpr float ANG_DAMPING = 2.3f;
 
-static constexpr float BANK_RATE = 0.8f;
-static constexpr float BANK_MAX = glm::radians(15.f);
+static constexpr float BANK_RATE = 1.5f;
+static constexpr float BANK_MAX = glm::radians(35.f);
 
 static constexpr float CAM_DIST_MIN = 24.f;
 static constexpr float CAM_DIST_MAX = 34.f;

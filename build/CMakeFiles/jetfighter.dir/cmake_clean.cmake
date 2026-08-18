@@ -1,0 +1,43 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/jetfighter.dir/src/Camera.cpp.o"
+  "CMakeFiles/jetfighter.dir/src/Camera.cpp.o.d"
+  "CMakeFiles/jetfighter.dir/src/GameWindow.cpp.o"
+  "CMakeFiles/jetfighter.dir/src/GameWindow.cpp.o.d"
+  "CMakeFiles/jetfighter.dir/src/Plane.cpp.o"
+  "CMakeFiles/jetfighter.dir/src/Plane.cpp.o.d"
+  "CMakeFiles/jetfighter.dir/src/main.cpp.o"
+  "CMakeFiles/jetfighter.dir/src/main.cpp.o.d"
+  "CMakeFiles/jetfighter.dir/src/physics/PhysicsWorld.cpp.o"
+  "CMakeFiles/jetfighter.dir/src/physics/PhysicsWorld.cpp.o.d"
+  "CMakeFiles/jetfighter.dir/src/renderer/City.cpp.o"
+  "CMakeFiles/jetfighter.dir/src/renderer/City.cpp.o.d"
+  "CMakeFiles/jetfighter.dir/src/renderer/Enclosure.cpp.o"
+  "CMakeFiles/jetfighter.dir/src/renderer/Enclosure.cpp.o.d"
+  "CMakeFiles/jetfighter.dir/src/renderer/Exhaust.cpp.o"
+  "CMakeFiles/jetfighter.dir/src/renderer/Exhaust.cpp.o.d"
+  "CMakeFiles/jetfighter.dir/src/renderer/FFT.cpp.o"
+  "CMakeFiles/jetfighter.dir/src/renderer/FFT.cpp.o.d"
+  "CMakeFiles/jetfighter.dir/src/renderer/Ground.cpp.o"
+  "CMakeFiles/jetfighter.dir/src/renderer/Ground.cpp.o.d"
+  "CMakeFiles/jetfighter.dir/src/renderer/Model.cpp.o"
+  "CMakeFiles/jetfighter.dir/src/renderer/Model.cpp.o.d"
+  "CMakeFiles/jetfighter.dir/src/renderer/Ocean.cpp.o"
+  "CMakeFiles/jetfighter.dir/src/renderer/Ocean.cpp.o.d"
+  "CMakeFiles/jetfighter.dir/src/renderer/PlaneDebug.cpp.o"
+  "CMakeFiles/jetfighter.dir/src/renderer/PlaneDebug.cpp.o.d"
+  "CMakeFiles/jetfighter.dir/src/renderer/Shader.cpp.o"
+  "CMakeFiles/jetfighter.dir/src/renderer/Shader.cpp.o.d"
+  "CMakeFiles/jetfighter.dir/src/renderer/Sky.cpp.o"
+  "CMakeFiles/jetfighter.dir/src/renderer/Sky.cpp.o.d"
+  "CMakeFiles/jetfighter.dir/src/renderer/Terrain.cpp.o"
+  "CMakeFiles/jetfighter.dir/src/renderer/Terrain.cpp.o.d"
+  "CMakeFiles/jetfighter.dir/src/renderer/Tracer.cpp.o"
+  "CMakeFiles/jetfighter.dir/src/renderer/Tracer.cpp.o.d"
+  "jetfighter"
+  "jetfighter.pdb"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/jetfighter.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

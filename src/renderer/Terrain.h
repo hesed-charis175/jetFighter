@@ -20,6 +20,9 @@ public:
 private:
   void buildMesh(int N, float size);
   void initShadowMap();
+  void buildHeightmap(float size);
+  float sampleHeightCache(float x, float z) const;
+
   GLuint shadowFBO, shadowTex;
   Shader shadowShader;
   static constexpr int SHADOW_RES = 2048;
@@ -28,4 +31,11 @@ private:
   GLuint vao, vbo, ebo;
   int indexCount;
   TerrainMode mode = TerrainMode::Mountains;
+
+  // Baked heightmap cache (computed once at startup, sampled every frame
+  // instead of re-running the FBM noise stack per vertex / per physics probe).
+  static constexpr int HEIGHT_RES = 512;
+  float worldSize = 12000.f;
+  std::vector<float> heightCache;
+  GLuint heightmapTex;
 };

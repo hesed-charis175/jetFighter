@@ -1,0 +1,43 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/rjetfighter.dir/src/Camera.cpp.o"
+  "CMakeFiles/rjetfighter.dir/src/Camera.cpp.o.d"
+  "CMakeFiles/rjetfighter.dir/src/GameWindow.cpp.o"
+  "CMakeFiles/rjetfighter.dir/src/GameWindow.cpp.o.d"
+  "CMakeFiles/rjetfighter.dir/src/Plane.cpp.o"
+  "CMakeFiles/rjetfighter.dir/src/Plane.cpp.o.d"
+  "CMakeFiles/rjetfighter.dir/src/main.cpp.o"
+  "CMakeFiles/rjetfighter.dir/src/main.cpp.o.d"
+  "CMakeFiles/rjetfighter.dir/src/physics/PhysicsWorld.cpp.o"
+  "CMakeFiles/rjetfighter.dir/src/physics/PhysicsWorld.cpp.o.d"
+  "CMakeFiles/rjetfighter.dir/src/renderer/City.cpp.o"
+  "CMakeFiles/rjetfighter.dir/src/renderer/City.cpp.o.d"
+  "CMakeFiles/rjetfighter.dir/src/renderer/Enclosure.cpp.o"
+  "CMakeFiles/rjetfighter.dir/src/renderer/Enclosure.cpp.o.d"
+  "CMakeFiles/rjetfighter.dir/src/renderer/Exhaust.cpp.o"
+  "CMakeFiles/rjetfighter.dir/src/renderer/Exhaust.cpp.o.d"
+  "CMakeFiles/rjetfighter.dir/src/renderer/FFT.cpp.o"
+  "CMakeFiles/rjetfighter.dir/src/renderer/FFT.cpp.o.d"
+  "CMakeFiles/rjetfighter.dir/src/renderer/Ground.cpp.o"
+  "CMakeFiles/rjetfighter.dir/src/renderer/Ground.cpp.o.d"
+  "CMakeFiles/rjetfighter.dir/src/renderer/Model.cpp.o"
+  "CMakeFiles/rjetfighter.dir/src/renderer/Model.cpp.o.d"
+  "CMakeFiles/rjetfighter.dir/src/renderer/Ocean.cpp.o"
+  "CMakeFiles/rjetfighter.dir/src/renderer/Ocean.cpp.o.d"
+  "CMakeFiles/rjetfighter.dir/src/renderer/PlaneDebug.cpp.o"
+  "CMakeFiles/rjetfighter.dir/src/renderer/PlaneDebug.cpp.o.d"
+  "CMakeFiles/rjetfighter.dir/src/renderer/Shader.cpp.o"
+  "CMakeFiles/rjetfighter.dir/src/renderer/Shader.cpp.o.d"
+  "CMakeFiles/rjetfighter.dir/src/renderer/Sky.cpp.o"
+  "CMakeFiles/rjetfighter.dir/src/renderer/Sky.cpp.o.d"
+  "CMakeFiles/rjetfighter.dir/src/renderer/Terrain.cpp.o"
+  "CMakeFiles/rjetfighter.dir/src/renderer/Terrain.cpp.o.d"
+  "CMakeFiles/rjetfighter.dir/src/renderer/Tracer.cpp.o"
+  "CMakeFiles/rjetfighter.dir/src/renderer/Tracer.cpp.o.d"
+  "rjetfighter"
+  "rjetfighter.pdb"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/rjetfighter.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

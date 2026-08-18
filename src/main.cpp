@@ -2,6 +2,7 @@
 #include "GameWindow.h"
 #include "Keys.h"
 #include "Plane.h"
+#include "RadarSystem.hpp" // <-- Added
 #include "config.h"
 #include "physics/PhysicsWorld.h"
 #include "physics/PlaneBody.h"
@@ -17,6 +18,7 @@
 #include "renderer/Tracer.h"
 #include <SDL2/SDL_video.h>
 #include <iostream>
+#include <vector> // <-- Added
 
 PlaneInput playerInput(const Uint8 *keys) {
   PlaneInput in;
@@ -43,6 +45,10 @@ int main() {
   Terrain terrain;
   Ocean ocean(128, 3500.f, 3500.f);
 
+  // Initialize Radar System
+  RadarSystem radar((float)window.size.w, (float)window.size.h, 110.0f,
+                    2500.0f);
+
   Shader modelShader("assets/shaders/model.vert", "assets/shaders/model.frag");
   Model rafale("assets/models/dassault_rafale.glb", modelShader);
 
@@ -50,6 +56,8 @@ int main() {
 
   PlaneDebug planeDebug;
   float cityTerrainY = terrain.heightAt(0.f, 0.f);
+  radar.SetLandmarks(glm::vec3(0.f, cityTerrainY, 0.f), /*cityRadius=*/900.f,
+                     ENCLOSURE_SIZE * 0.5f, ALTITUDE_MAX);
   Shader cityShader("assets/shaders/model.vert", "assets/shaders/model.frag");
   City city("assets/models/city/source/city.glb", cityShader, physics,
             glm::vec3(0.f, cityTerrainY, 0.f), 1.0f);
@@ -180,15 +188,8 @@ int main() {
 
       planeBodies[i]->pushAeroForces(planes[i].speed, planes[i].thrustFraction,
                                      planes[i].yawRate, planes[i].pitchRate,
-                                     dt);
-
-      glm::quat bankRot =
-          glm::angleAxis(planes[i].bankAngle,
-                         planeBodies[i]->body.orientation * glm::vec3(0, 0, 1));
-      planeBodies[i]->body.orientation =
-          glm::normalize(bankRot * planes[i].orientation);
+                                     planes[i].bankAngle, dt);
     }
-
     physics.step(dt);
     traceFireTimer += dt;
     if (keys[SDL_SCANCODE_KP_7] && traceFireTimer >= TRACER_FIRE_RATE) {
@@ -285,6 +286,7 @@ int main() {
                  altitude);
     ocean.draw(view, proj, sunDir, sunElev, time);
     enclosure.draw(proj * view);
+    city.draw(view, proj, sunDir, lightSpaceMat2, shadowTex2);
     for (int i = 0; i < NUM_PLANES; ++i) {
       rafale.draw(planes[i].modelMat, view, proj, sunDir, lightSpaceMat,
                   shadowTex);
@@ -292,9 +294,22 @@ int main() {
       exhausts[i].draw(view, proj, cam.pos);
     }
 
-    city.draw(view, proj, sunDir, lightSpaceMat2, shadowTex2);
     tracer.draw(proj * view, cam.pos);
 
+    // ==================== RADAR RENDER ====================
+    std::vector<RadarBlip> radarBlips;
+    for (int i = 1; i < NUM_PLANES; ++i) {
+      radarBlips.push_back(
+          {planes[i].position, glm::vec3(1.0f, 0.1f, 0.1f), 7.0f});
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, window.size.w, window.size.h);
+
+    radar.SetScreenSize((float)window.size.w, (float)window.size.h);
+    radar.RenderRadar(planes[0].position, planes[0].orientation, terrainBelow,
+                      radarBlips);
+    // ======================================================
     SDL_GL_SwapWindow(window.win);
   }
 

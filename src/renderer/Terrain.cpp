@@ -10,6 +10,8 @@ Terrain::Terrain()
       shadowShader("assets/shaders/shadowmap.vert",
                    "assets/shaders/shadowmap.frag") {
   buildMesh(256, 12000.f);
+  buildHeightmap(12000.f); // bake once — was previously recomputed every
+                           // vertex, every frame
   initShadowMap();
 }
 void Terrain::buildMesh(int N, float size) {
@@ -53,7 +55,26 @@ void Terrain::buildMesh(int N, float size) {
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
   glBindVertexArray(0);
 }
+float Terrain::sampleHeightCache(float x, float z) const {
+  float u = (x / worldSize + 0.5f) * (HEIGHT_RES - 1);
+  float v = (z / worldSize + 0.5f) * (HEIGHT_RES - 1);
+  u = glm::clamp(u, 0.f, (float)(HEIGHT_RES - 1));
+  v = glm::clamp(v, 0.f, (float)(HEIGHT_RES - 1));
 
+  int x0 = (int)u, z0 = (int)v;
+  int x1 = glm::min(x0 + 1, HEIGHT_RES - 1);
+  int z1 = glm::min(z0 + 1, HEIGHT_RES - 1);
+  float fx = u - x0, fz = v - z0;
+
+  float h00 = heightCache[z0 * HEIGHT_RES + x0];
+  float h10 = heightCache[z0 * HEIGHT_RES + x1];
+  float h01 = heightCache[z1 * HEIGHT_RES + x0];
+  float h11 = heightCache[z1 * HEIGHT_RES + x1];
+
+  float h0 = glm::mix(h00, h10, fx);
+  float h1 = glm::mix(h01, h11, fx);
+  return glm::mix(h0, h1, fz);
+}
 Terrain::~Terrain() {
   glDeleteVertexArrays(1, &vao);
   glDeleteBuffers(1, &vbo);
@@ -117,18 +138,17 @@ static float terrainHeight(glm::vec2 xz) {
 }
 
 float Terrain::heightAt(float x, float z) const {
-  return terrainHeight(glm::vec2(x, z));
+  return sampleHeightCache(x, z);
 }
 
 glm::vec3 Terrain::normalAt(float x, float z) const {
   const float e = 3.f;
-  float hL = terrainHeight(glm::vec2(x - e, z));
-  float hR = terrainHeight(glm::vec2(x + e, z));
-  float hD = terrainHeight(glm::vec2(x, z - e));
-  float hU = terrainHeight(glm::vec2(x, z + e));
+  float hL = sampleHeightCache(x - e, z);
+  float hR = sampleHeightCache(x + e, z);
+  float hD = sampleHeightCache(x, z - e);
+  float hU = sampleHeightCache(x, z + e);
   return glm::normalize(glm::vec3(hL - hR, 2.f * e, hD - hU));
 }
-
 void Terrain::draw(const glm::mat4 &view, const glm::mat4 &proj,
                    const glm::vec3 &sunDir, float sunElev, float time,
                    const glm::mat4 &lightSpaceMat, GLuint shadowTex,
@@ -148,6 +168,12 @@ void Terrain::draw(const glm::mat4 &view, const glm::mat4 &proj,
   if (mode == TerrainMode::Ocean)
     sh.setFloat("uTime", time);
 
+  if (mode == TerrainMode::Mountains) {
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, heightmapTex);
+    glUniform1i(glGetUniformLocation(sh.id, "uTerrainHeightMap"), 1);
+    sh.setFloat("uWorldSize", worldSize);
+  }
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, shadowTex);
   glUniform1i(glGetUniformLocation(sh.id, "uShadowMap"), 0);
@@ -155,6 +181,27 @@ void Terrain::draw(const glm::mat4 &view, const glm::mat4 &proj,
   glBindVertexArray(vao);
   glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
   glBindVertexArray(0);
+}
+void Terrain::buildHeightmap(float size) {
+  worldSize = size;
+  heightCache.resize(HEIGHT_RES * HEIGHT_RES);
+  for (int z = 0; z < HEIGHT_RES; z++) {
+    for (int x = 0; x < HEIGHT_RES; x++) {
+      float wx = (x / float(HEIGHT_RES - 1) - 0.5f) * size;
+      float wz = (z / float(HEIGHT_RES - 1) - 0.5f) * size;
+      heightCache[z * HEIGHT_RES + x] = terrainHeight(glm::vec2(wx, wz));
+    }
+  }
+
+  glGenTextures(1, &heightmapTex);
+  glBindTexture(GL_TEXTURE_2D, heightmapTex);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, HEIGHT_RES, HEIGHT_RES, 0, GL_RED,
+               GL_FLOAT, heightCache.data());
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Terrain::initShadowMap() {

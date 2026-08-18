@@ -121,14 +121,14 @@ void Ocean::uploadHeightmap() {
   const float scale = 0.012f;
   for (int y = 0; y < N; y++)
     for (int x = 0; x < N; x++) {
-      float h = (float)(pow(-1, x + y) * hr[y][x]) * scale;
+      float sign = ((x + y) & 1) ? -1.f : 1.f;
+      float h = sign * (float)hr[y][x] * scale;
       heightData[y * N + x] = h;
     }
   glBindTexture(GL_TEXTURE_2D, heightTex);
   glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, N, N, GL_RED, GL_FLOAT,
                   heightData.data());
 }
-
 void Ocean::update(float t) {
   computeFFT(t);
   uploadHeightmap();

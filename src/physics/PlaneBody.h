@@ -24,7 +24,7 @@ public:
   }
 
   void pushAeroForces(float speed, float thrustFrac, float yawRate,
-                      float pitchRate, float dt) {
+                      float pitchRate, float bankAngle, float dt) {
     glm::vec3 noseDir = glm::normalize(body.orientation * glm::vec3(0, 0, -1));
     glm::vec3 localUp = glm::normalize(body.orientation * glm::vec3(0, 1, 0));
     glm::vec3 localRight =
@@ -50,8 +50,13 @@ public:
     constexpr float S_WING = 45.7f;
     constexpr float CL = 0.30f;
     float lift = 0.5f * RHO * speed * speed * S_WING * CL;
-    body.persistentForce += localUp * lift;
-
+    // Tilt lift sideways by the current bank angle (about the nose axis) so
+    // banking actually curves the flight path — this is what makes A/D turn
+    // the plane's heading, not just roll it. bankAngle is NOT written into
+    // body.orientation anywhere, so it can never accumulate across frames.
+    glm::quat bankTilt = glm::angleAxis(bankAngle, noseDir);
+    glm::vec3 liftUp = bankTilt * localUp;
+    body.persistentForce += liftUp * lift;
     constexpr float CD = 0.03f;
     float drag = 0.5f * RHO * speed * speed * S_WING * CD;
     glm::vec3 velDir = glm::length(body.linearVel) > 0.1f
@@ -67,7 +72,12 @@ public:
     float speedFactor = glm::clamp(speed / 80.f, 0.5f, 4.0f);
     body.persistentTorque -= localUp * (wYaw * YAW_DAMP * speedFactor);
     body.persistentTorque -= localRight * (wPitch * PITCH_DAMP * speedFactor);
-    body.persistentTorque += localUp * (yawRate * 500000.f * speedFactor);
+    // Turn strength now scales directly with how far you're banked (sin of the
+    // bank angle), not with raw stick input — roll in harder, turn tighter.
+    constexpr float TURN_AUTHORITY = 1600000.f;
+    float turnFactor = glm::sin(bankAngle);
+    body.persistentTorque +=
+        localUp * (turnFactor * TURN_AUTHORITY * speedFactor);
     body.persistentTorque += localRight * (pitchRate * 600000.f * speedFactor);
     glm::vec3 lateralErr = glm::cross(noseDir, velDir);
     body.persistentTorque -= lateralErr * CONTROL_AUTHORITY * speedFactor;
